@@ -3,11 +3,8 @@ import yt_dlp as yt_dlp
 import assemblyai as aai
 from configure import auth_key
 
-with st.form("youtube_url_form"):
-    youtube_url = st.text_input("Enter the YouTube URL:")
-    submit_button = st.form_submit_button("Submit")
-
-if submit_button:
+@st.cache_data
+def transcribe_audio(youtube_url):
     with yt_dlp.YoutubeDL() as ydl:
         info = ydl.extract_info(youtube_url, download=False)
 
@@ -19,9 +16,27 @@ if submit_button:
             break
 
     aai.settings.api_key = auth_key
-
     transcriber = aai.Transcriber()
     transcript = transcriber.transcribe(url)
+    return transcript.text
 
-    with st.expander("Video Transcript"):
-        st.write(transcript.text)
+st.set_page_config(page_title="YouTube Transcription App")
+
+with st.form("youtube_url_form"):
+    st.subheader("Enter YouTube URL")
+    youtube_url = st.text_input("YouTube URL", placeholder="Enter the YouTube URL")
+    submit_button = st.form_submit_button("Transcribe")
+
+if submit_button:
+    try:
+        transcript = transcribe_audio(youtube_url)
+        st.subheader("Video Transcript")
+        st.markdown(transcript)
+        st.download_button(
+            label="Download Transcript",
+            data=transcript,
+            file_name="transcript.txt",
+            mime="text/plain",
+        )
+    except Exception as e:
+        st.error(f"Error: {e}")
