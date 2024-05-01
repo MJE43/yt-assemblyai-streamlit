@@ -1,0 +1,27 @@
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+
+# Streamlit files
+.streamlit/
+
+# AssemblyAI API key
+configure.py
+
+# IDE specific files
+.vscode/
+.idea/
+
+# macOS specific files
+.DS_Store
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
