@@ -52,21 +52,27 @@ if submit_button:
             with st.spinner('Transcribing audio... Please wait.'):
                 transcript_data = transcribe_audio(youtube_url, speaker_labels, speakers_expected)
             
-            st.subheader("Video Transcript")
-            if speaker_labels:
-                for utterance in transcript_data['utterances']:
-                    st.write(f"Speaker {utterance['speaker']}: {utterance['text']}")
-                # Prepare data for download
-                download_data = "\n".join(f"Speaker {utterance['speaker']}: {utterance['text']}" for utterance in transcript_data['utterances'])
-            else:
-                st.markdown(transcript_data['text'])
-                download_data = transcript_data['text']
-            
-            st.download_button(
-                label="Download Transcript",
-                data=download_data,
-                file_name="transcript.txt",
-                mime="text/plain",
-            )
+            # Store the transcript data in session state
+            st.session_state.transcript_data = transcript_data
+
         except Exception as e:
             st.error(f"Error: {e}")
+
+# Display the transcript if it exists in the session state
+if "transcript_data" in st.session_state:
+    st.subheader("Video Transcript")
+    if isinstance(st.session_state.transcript_data, dict) and "utterances" in st.session_state.transcript_data:
+        for utterance in st.session_state.transcript_data['utterances']:
+            st.write(f"Speaker {utterance['speaker']}: {utterance['text']}")
+        # Prepare data for download
+        download_data = "\n".join(f"Speaker {utterance['speaker']}: {utterance['text']}" for utterance in st.session_state.transcript_data['utterances'])
+    else:
+        st.markdown(st.session_state.transcript_data['text'])
+        download_data = st.session_state.transcript_data['text']
+    
+    st.download_button(
+        label="Download Transcript",
+        data=download_data,
+        file_name="transcript.txt",
+        mime="text/plain",
+    )
