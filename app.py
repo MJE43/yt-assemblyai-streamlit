@@ -39,10 +39,13 @@ with st.form("youtube_url_form"):
     speakers_expected = st.number_input("Number of Speakers (optional)", min_value=1, step=1, help="Specify the number of speakers for better accuracy.")
     submit_button = st.form_submit_button("Transcribe")
 
+# Display video if URL is provided
+if youtube_url:
+    st.video(youtube_url)
+
 # Handle form submission
 if submit_button and youtube_url:
     try:
-        st.video(youtube_url)
         with st.spinner('Transcribing audio... Please wait.'):
             transcript_data = transcribe_audio(youtube_url, speaker_labels, speakers_expected)
         st.session_state.transcript_data = transcript_data
